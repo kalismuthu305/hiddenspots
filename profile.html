@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - HiddenGems</title>
+    <meta name="theme-color" content="#38bdf8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header glass">
+            <img class="cover" id="coverPhoto" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400"
+                alt="Cover">
+            <div class="profile-info">
+                <div class="avatar-container">
+                    <img class="avatar" id="profileAvatar"
+                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" alt="Avatar">
+                    <button class="upload-btn" title="Change photo">📷</button>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+                <div class="profile-details">
+                    <div class="profile-name" id="profileName">Kaleeshwari</div>
+                    <div class="profile-email" id="profileEmail">kaleeshwari@chennai.com</div>
+                    <div class="stats">
+                        <div class="stat" data-tab="places">
+                            <span class="stat-value" id="userPlacesCount">12</span><span
+                                class="stat-label">Places</span>
+                        </div>
+                        <div class="stat" data-tab="reviews">
+                            <span class="stat-value" id="userReviewsCount">28</span><span
+                                class="stat-label">Reviews</span>
+                        </div>
+                        <div class="stat" data-tab="favorites">
+                            <span class="stat-value" id="userFavoritesCount">45</span><span
+                                class="stat-label">Favorites</span>
+                        </div>
+                        <div class="stat" data-tab="photos">
+                            <span class="stat-value" id="userPhotosCount">67</span><span
+                                class="stat-label">Photos</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-primary" id="editProfileBtn">✏️ Edit</button>
+                    <button class="btn btn-secondary" id="shareProfileBtn">📤 Share</button>
+                    <button class="btn btn-danger" id="logoutBtn">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container glass">
+            <div class="tabs">
+                <div class="tab active" data-tab="places">📍 My Places</div>
+                <div class="tab" data-tab="photos">📸 Photos</div>
+                <div class="tab" data-tab="favorites">❤️ Favorites</div>
+                <div class="tab" data-tab="reviews">⭐ Reviews</div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content glass" style="padding: 30px;">
+            <div class="grid" id="placesContent"></div>
+            <div class="grid hidden" id="photosContent"></div>
+            <div class="grid hidden" id="favoritesContent"></div>
+            <div class="grid hidden" id="reviewsContent"></div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <style>
+        :root {
+            --primary: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            transition: all .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .glass:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .profile-header {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .cover {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform .5s ease;
+        }
+
+        .profile-header:hover .cover {
+            transform: scale(1.05);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: flex-end;
+            padding: 30px 30px 20px;
+            gap: 30px;
+        }
+
+        .avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, .9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+            object-fit: cover;
+            cursor: pointer;
+            transition: all .3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, .4);
+            transition: all .2s ease;
+            font-size: 16px;
+        }
+
+        .upload-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .profile-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .profile-email {
+            font-size: 16px;
+            opacity: .9;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, .05);
+            border-radius: 16px;
+            flex: 1;
+            transition: all .3s ease;
+            cursor: pointer;
+        }
+
+        .stat:hover {
+            background: rgba(56, 189, 248, .1);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: .8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, .1);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .tabs-container {
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all .2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: rgba(30, 41, 59, .6);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, .3);
+        }
+
+        .content {
+            min-height: 400px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-item {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all .3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .4);
+        }
+
+        .grid-item-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .grid-item-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .grid-item-category {
+            display: inline-flex;
+            padding: 4px 12px;
+            background: rgba(16, 185, 129, .2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading,
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: .5;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, .2);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform .3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .toast.info {
+            background: var(--primary);
+        }
+
+        @media(max-width:768px) {
+            .profile-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <script>
+        class ProfileManager {
+            constructor() {
+                this.demoData = {
+                    places: [{ name: 'Marina Hidden Beach', category: 'nature', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400' },
+                    { name: 'Secret Anna Nagar Cafe', category: 'food', image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400' },
+                    { name: 'Fort Viewpoint', category: 'history', image: 'https://images.unsplash.com/photo-1571896349840-e26a6e64c46d?w=400' }],
+                    photos: [{ url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400' }, { url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400' }],
+                    favorites: [{ name: 'Besant Nagar Sunset', category: 'views', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400' }],
+                    reviews: [{ place: 'Marina Beach', rating: 5, comment: 'Perfect hidden spot! 🏖️' }, { place: 'Secret Cafe', rating: 4, comment: 'Amazing filter coffee ☕' }]
+                };
+            }
+            init() {
+                this.loadTabContent('places');
+                this.bindEvents();
+                setTimeout(() => this.showToast('Welcome Kaleeshwari! 👋', 'success'), 500);
+            }
+            bindEvents() {
+                document.querySelectorAll('.tab, .stat').forEach(el => el.onclick = () => this.switchTab(el.dataset.tab));
+                document.querySelector('.upload-btn').onclick = () => document.getElementById('fileInput').click();
+                document.getElementById('fileInput').onchange = e => this.handleImageUpload(e);
+                document.getElementById('logoutBtn').onclick = () => this.logout();
+                document.getElementById('shareProfileBtn').onclick = () => this.shareProfile();
+                document.getElementById('editProfileBtn').onclick = () => this.showToast('Edit coming soon! ✨', 'info');
+            }
+            switchTab(tab) { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.grid').forEach(g => g.classList.toggle('hidden', g.id !== `${tab}Content`)); this.loadTabContent(tab); }
+            async loadTabContent(tab) { const c = document.getElementById(`${tab}Content`); c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>'; await new Promise(r => setTimeout(r, 500)); this.renderGrid(tab, this.demoData[tab] || []); }
+            renderGrid(tab, data) { const c = document.getElementById(`${tab}Content`); if (!data.length) { c.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${this.getIcon(tab)}</div><h3>No ${tab} yet</h3><p>Start exploring!</p></div>`; return; } c.innerHTML = data.map(i => this.renderItem(tab, i)).join(''); }
+            renderItem(tab, item) { if (tab === 'photos') return `<div class="grid-item"><img src="${item.url}" class="grid-item-image"></div>`; if (tab === 'reviews') return `<div class="grid-item"><div style="font-weight:600">${item.place}</div><div style="color:#fbbf24;font-size:18px">⭐ ${item.rating}</div><div style="opacity:.9;margin-top:8px">${item.comment}</div></div>`; return `<div class="grid-item"><img src="${item.image}" class="grid-item-image"><div class="grid-item-category">${this.getEmoji(item.category)}</div><div class="grid-item-title">${item.name}</div></div>`; }
+            handleImageUpload(e) { const f = e.target.files[0]; if (f && f.type.startsWith('image/')) { const r = new FileReader(); r.onload = ev => { document.getElementById('profileAvatar').src = ev.target.result; localStorage.profileImage = ev.target.result; this.showToast('✅ Photo updated!', 'success'); }; r.readAsDataURL(f); } }
+            logout() { localStorage.clear(); this.showToast('👋 See you!', 'success'); setTimeout(() => location.href = 'index.html', 1500); }
+            shareProfile() { navigator.clipboard.writeText(location.href); this.showToast('🔗 Link copied!', 'success'); }
+            showToast(m, t = 'info') { const c = document.getElementById('toastContainer'), o = document.createElement('div'); o.className = `toast ${t}`; o.textContent = m; c.appendChild(o); setTimeout(() => o.classList.add('show'), 100); setTimeout(() => { o.classList.remove('show'); setTimeout(() => o.remove(), 300); }, 3000); }
+            getIcon(t) { const i = { places: '📍', photos: '📸', favorites: '❤️', reviews: '⭐' }; return i[t] || '📋'; }
+            getEmoji(c) { const e = { nature: '🌿', food: '🍽️', history: '🏛️', views: '🌄' }; return e[c] || '📍'; }
+        }
+        let p; document.addEventListener('DOMContentLoaded', () => { p = new ProfileManager(); p.init(); });
+    </script>
+</body>
+
+</html>

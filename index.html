@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiddenGems - Discover Local Hidden Places</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="logo-icon">🗺️</span>
+                <span class="logo-text">HiddenGems</span>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#places">Explore</a></li>
+                <li><a href="#map">Map</a></li>
+                <li><a href="#suggest">Suggest Place</a></li>
+                <li>
+                    <a href="profile.html" class="profile-btn">Profile</a>
+                </li>
+                
+                <li><a href="#" class="login-btn" id="authBtn">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Local Hidden Gems</h1>
+            <p class="hero-subtitle">Uncover authentic, lesser-known places in your area</p>
+
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput"
+                        placeholder="Search by mood, interest, or place...">
+                    <button class="search-btn" id="searchBtn">Search</button>
+                </div>
+                <div class="search-options">
+                    <button class="location-btn" id="useLocation">
+                        <span class="btn-icon">📍</span>
+                        <span>Use My Location</span>
+                    </button>
+                    <button class="filter-toggle" id="filterToggle">
+                        <span class="btn-icon">🎯</span>
+                        <span>Filters</span>
+                    </button>
+                </div>
+
+                <!-- Radius Filter -->
+                <div class="radius-filter" id="radiusFilter">
+                    <label>Search Radius: <span id="radiusValue">10</span> km</label>
+                    <input type="range" id="radiusSlider" min="1" max="50" value="10" class="radius-slider">
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-section hidden" id="filterSection">
+                <div class="filter-title">Filter by Category:</div>
+                <div class="category-filters">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="nature">🌿 Nature</button>
+                    <button class="category-btn" data-category="food">🍽️ Food</button>
+                    <button class="category-btn" data-category="history">🏛️ History</button>
+                    <button class="category-btn" data-category="adventure">🧗 Adventure</button>
+                    <button class="category-btn" data-category="quiet">😌 Quiet Spots</button>
+                    <button class="category-btn" data-category="culture">🎭 Culture</button>
+                    <button class="category-btn" data-category="views">🌄 Views</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Widget -->
+        <div class="weather-widget" id="weatherWidget">
+            <div class="weather-icon" id="weatherIcon">🌤️</div>
+            <div class="weather-info">
+                <div class="weather-temp" id="weatherTemp">--°C</div>
+                <div class="weather-desc" id="weatherDesc">Loading...</div>
+            </div>
+            <div class="weather-suggestion">
+                <span class="weather-label">Perfect for:</span>
+                <span class="weather-recommendation" id="weatherRecommendation">--</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item glass-card">
+                <div class="stat-icon">📍</div>
+                <div class="stat-number" id="totalPlaces">0</div>
+                <div class="stat-label">Hidden Places</div>
+            </div>
+            <div class="stat-item glass-card">
+                <div class="stat-icon">😊</div>
+                <div class="stat-number" id="happyExplorers">0</div>
+                <div class="stat-label">Happy Explorers</div>
+            </div>
+            <div class="stat-item glass-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-number" id="totalReviews">0</div>
+                <div class="stat-label">Reviews</div>
+            </div>
+            <div class="stat-item glass-card">
+                <div class="stat-icon">📂</div>
+                <div class="stat-number" id="categories">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Places Section -->
+    <section class="places-section" id="places">
+        <div class="section-header">
+            <h2 class="section-title">Explore Hidden Gems</h2>
+            <p class="section-subtitle">Discover authentic local spots near you</p>
+        </div>
+
+        <div class="places-grid" id="placesGrid">
+            <!-- Places will be dynamically loaded here -->
+        </div>
+
+        <div class="load-more-container">
+            <button class="load-more-btn" id="loadMoreBtn">
+                <span class="btn-text">Load More Places</span>
+                <span class="btn-loader hidden">
+                    <div class="spinner"></div>
+                </span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section" id="map">
+        <div class="map-header">
+            <h2 class="section-title">Interactive Map</h2>
+            <p class="section-subtitle">Find hidden places near you</p>
+        </div>
+
+        <div class="map-controls">
+            <button class="map-control-btn active" id="streetViewBtn">
+                <span>🗺️</span> Street View
+            </button>
+            <button class="map-control-btn" id="satelliteViewBtn">
+                <span>🛰️</span> Satellite
+            </button>
+            <button class="map-control-btn" id="terrainViewBtn">
+                <span>🏔️</span> Terrain
+            </button>
+            <button class="map-control-btn" id="resetMapBtn">
+                <span>🔄</span> Reset View
+            </button>
+            <button class="map-control-btn" id="myLocationBtn">
+                <span>📍</span> My Location
+            </button>
+        </div>
+
+        <div class="radius-control glass-card">
+            <label>Show places within:</label>
+            <select id="mapRadiusSelect">
+                <option value="5">5 km</option>
+                <option value="10" selected>10 km</option>
+                <option value="20">20 km</option>
+                <option value="50">50 km</option>
+                <option value="100">100 km</option>
+            </select>
+        </div>
+
+        <div id="mapContainer" class="map-container"></div>
+
+        <!-- Map Legend -->
+        <div class="map-legend glass-card">
+            <h4>Legend</h4>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="legend-marker nature"></span>
+                    <span>Nature</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker food"></span>
+                    <span>Food</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker history"></span>
+                    <span>History</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker adventure"></span>
+                    <span>Adventure</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker culture"></span>
+                    <span>Culture</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker views"></span>
+                    <span>Views</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suggest Place Section -->
+    <section class="suggest-section" id="suggest">
+        <div class="section-header">
+            <h2 class="section-title">Suggest a Hidden Place</h2>
+            <p class="section-subtitle">Help others discover hidden gems</p>
+        </div>
+
+        <div class="suggest-form-container glass-card">
+            <form class="suggest-form" id="suggestForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="placeName">Place Name *</label>
+                        <input type="text" id="placeName" class="form-input" placeholder="Enter place name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placeCategory">Category *</label>
+                        <select id="placeCategory" class="form-select" required>
+                            <option value="">Select category</option>
+                            <option value="nature">🌿 Nature</option>
+                            <option value="food">🍽️ Food</option>
+                            <option value="history">🏛️ History</option>
+                            <option value="adventure">🧗 Adventure</option>
+                            <option value="quiet">😌 Quiet Spots</option>
+                            <option value="culture">🎭 Culture</option>
+                            <option value="views">🌄 Views</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="placeDescription">Description *</label>
+                    <textarea id="placeDescription" class="form-textarea"
+                        placeholder="Describe what makes this place special..." rows="4" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="placeAddress">Address *</label>
+                        <input type="text" id="placeAddress" class="form-input" placeholder="Enter address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placeMood">Mood</label>
+                        <select id="placeMood" class="form-select">
+                            <option value="">Select mood</option>
+                            <option value="peaceful">Peaceful</option>
+                            <option value="romantic">Romantic</option>
+                            <option value="adventurous">Adventurous</option>
+                            <option value="family-friendly">Family-Friendly</option>
+                            <option value="photogenic">Photogenic</option>
+                            <option value="spiritual">Spiritual</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="latitude">Latitude *</label>
+                        <input type="number" step="any" id="latitude" class="form-input" placeholder="e.g., 13.0827"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">Longitude *</label>
+                        <input type="number" step="any" id="longitude" class="form-input" placeholder="e.g., 80.2707"
+                            required>
+                    </div>
+                </div>
+
+                <button type="button" class="location-fill-btn" id="autoFillLocation">
+                    <span>📍 Auto-fill Coordinates from Current Location</span>
+                </button>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bestTime">Best Time to Visit</label>
+                        <input type="text" id="bestTime" class="form-input"
+                            placeholder="e.g., Morning, Sunset, Weekdays">
+                    </div>
+                    <div class="form-group">
+                        <label for="entryCost">Entry Cost</label>
+                        <input type="text" id="entryCost" class="form-input" placeholder="e.g., Free, $5, $10">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="placeImages">Add Photos</label>
+                    <div class="image-upload-container">
+                        <input type="file" id="placeImages" class="image-input" accept="image/*" multiple>
+                        <div class="image-upload-placeholder" id="imageUploadPlaceholder">
+                            <span class="upload-icon">📷</span>
+                            <span>Click to upload or drag and drop</span>
+                            <span class="upload-hint">PNG, JPG up to 5MB each</span>
+                        </div>
+                        <div class="uploaded-images" id="uploadedImages"></div>
+                    </div>
+                </div>
+
+                <div class="form-progress hidden" id="uploadProgress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">Uploading...</span>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitPlaceBtn">
+                    <span class="btn-text">Submit Hidden Place</span>
+                    <span class="btn-loader hidden">
+                        <div class="spinner"></div>
+                    </span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+
+
+
+    <!-- Safety Guidelines Section -->
+    <section class="safety-section">
+        <div class="safety-container">
+            <h2 class="section-title">🛡️ Safety & Guidelines</h2>
+            <div class="safety-content">
+                <div class="safety-card glass-card">
+                    <h3>🚶 Travel Tips</h3>
+                    <ul>
+                        <li>Always inform someone about your plans</li>
+                        <li>Carry sufficient water and snacks</li>
+                        <li>Check weather conditions before visiting</li>
+                        <li>Keep emergency contacts handy</li>
+                    </ul>
+                </div>
+                <div class="safety-card glass-card">
+                    <h3>⚠️ Safety Rules</h3>
+                    <ul>
+                        <li>Respect local customs and traditions</li>
+                        <li>Avoid visiting alone at night</li>
+                        <li>Keep valuables secure</li>
+                        <li>Stay on marked trails when possible</li>
+                    </ul>
+                </div>
+                <div class="safety-card glass-card">
+                    <h3>🌱 Environmental Guidelines</h3>
+                    <ul>
+                        <li>Leave no trace - take your trash with you</li>
+                        <li>Respect wildlife and natural habitats</li>
+                        <li>Do not damage or remove natural elements</li>
+                        <li>Support local businesses and communities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login/Register Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="authModalTitle">Welcome to HiddenGems</h2>
+                <button class="modal-close" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="register">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password"
+                            required>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Login</span>
+                        <span class="btn-loader hidden">
+                            <div class="spinner"></div>
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form class="auth-form hidden" id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Name</label>
+                        <input type="text" id="registerName" class="form-input" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="Enter your email"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" class="form-input"
+                            placeholder="Create a password (min 6 characters)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input"
+                            placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Register</span>
+                        <span class="btn-loader hidden">
+                            <div class="spinner"></div>
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Google Sign In -->
+                <div class="social-auth">
+                    <p>Or continue with</p>
+                    <button class="google-btn" id="googleSignInBtn">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        <span>Sign in with Google</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Place Detail Modal -->
+    <div class="modal" id="placeDetailModal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2 id="placeDetailName">Place Name</h2>
+                <button class="modal-close" id="closePlaceDetailModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="place-detail-content">
+                    <!-- Image Carousel -->
+                    <div class="place-carousel">
+                        <button class="carousel-btn prev" id="carouselPrev">❮</button>
+                        <div class="carousel-images" id="carouselImages">
+                            <!-- Images will be loaded here -->
+                        </div>
+                        <button class="carousel-btn next" id="carouselNext">❯</button>
+                        <div class="carousel-dots" id="carouselDots"></div>
+                    </div>
+
+                    <div class="place-info">
+                        <div class="place-meta-badges">
+                            <span class="place-category-badge" id="placeDetailCategory">Category</span>
+                            <span class="place-mood-badge" id="placeDetailMood">Mood</span>
+                        </div>
+
+                        <!-- Rating Section -->
+                        <div class="rating-section">
+                            <div class="rating-display">
+                                <span class="rating-score" id="placeDetailRatingScore">0.0</span>
+                                <div class="rating-stars" id="placeDetailRatingStars">
+                                    <!-- Stars will be rendered here -->
+                                </div>
+                                <span class="rating-count" id="placeDetailRatingCount">(0 reviews)</span>
+                            </div>
+                        </div>
+
+                        <p class="place-description" id="placeDetailDescription">Description goes here...</p>
+
+                        <div class="place-details-grid">
+                            <div class="detail-item glass-card">
+                                <span class="detail-icon">📍</span>
+                                <div class="detail-content">
+                                    <span class="detail-label">Address</span>
+                                    <span class="detail-value" id="placeDetailAddress">Address</span>
+                                </div>
+                            </div>
+                            <div class="detail-item glass-card">
+                                <span class="detail-icon">⏰</span>
+                                <div class="detail-content">
+                                    <span class="detail-label">Best Time</span>
+                                    <span class="detail-value" id="placeDetailBestTime">Best Time</span>
+                                </div>
+                            </div>
+                            <div class="detail-item glass-card">
+                                <span class="detail-icon">💰</span>
+                                <div class="detail-content">
+                                    <span class="detail-label">Entry Cost</span>
+                                    <span class="detail-value" id="placeDetailCost">Entry Cost</span>
+                                </div>
+                            </div>
+                            <div class="detail-item glass-card">
+                                <span class="detail-icon">👥</span>
+                                <div class="detail-content">
+                                    <span class="detail-label">Crowd Level</span>
+                                    <span class="detail-value" id="placeDetailCrowd">Low</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="place-submitted-by">
+                            <span>Added by:</span>
+                            <span id="placeSubmittedBy">Anonymous</span>
+                        </div>
+
+                        <div class="place-actions">
+                            <button class="action-btn" id="favoriteBtn">
+                                <span class="btn-icon">🤍</span> Save
+                            </button>
+                            <button class="action-btn" id="shareBtn">
+                                <span class="btn-icon">📤</span> Share
+                            </button>
+                            <button class="action-btn" id="directionsBtn">
+                                <span class="btn-icon">🧭</span> Directions
+                            </button>
+                        </div>
+
+                        <div class="place-map-preview" id="placeMapPreview"></div>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3>Reviews & Ratings</h3>
+
+                    <!-- Add Review Form -->
+                    <div class="review-form glass-card" id="reviewForm">
+                        <h4>Write a Review</h4>
+                        <div class="rating-input">
+                            <span>Your Rating:</span>
+                            <div class="star-rating-input" id="starRatingInput">
+                                <span data-rating="1">★</span>
+                                <span data-rating="2">★</span>
+                                <span data-rating="3">★</span>
+                                <span data-rating="4">★</span>
+                                <span data-rating="5">★</span>
+                            </div>
+                            <span class="selected-rating" id="selectedRating">0/5</span>
+                        </div>
+                        <textarea class="review-input" id="reviewInput"
+                            placeholder="Share your experience..."></textarea>
+                        <button class="submit-review-btn" id="submitReviewBtn">Submit Review</button>
+                    </div>
+
+                    <div class="reviews-list" id="reviewsList">
+                        <!-- Reviews will be loaded here -->
+                    </div>
+
+                    <div class="load-more-reviews hidden" id="loadMoreReviews">
+                        <button class="load-more-btn-small" id="loadMoreReviewsBtn">Load More Reviews</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🗺️ HiddenGems</h3>
+                <p>Discover local hidden treasures and authentic experiences.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#places">Explore</a></li>
+                    <li><a href="#map">Map</a></li>
+                    <li><a href="#suggest">Suggest Place</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="#" data-category="nature">Nature</a></li>
+                    <li><a href="#" data-category="food">Food</a></li>
+                    <li><a href="#" data-category="history">History</a></li>
+                    <li><a href="#" data-category="adventure">Adventure</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📸</a>
+                    <a href="#" class="social-link">📺</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 HiddenGems. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Main JS -->
+    <script src="firebase-config.js"></script>
+    <script src="script.js">
+     
+    </script>
+</body>
+
+</html>

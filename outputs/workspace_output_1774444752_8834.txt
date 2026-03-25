@@ -1,0 +1,5 @@
+127.0.0.1 - - [25/Mar/2026 13:27:03] "GET /?password=76c56ce8-a7e7-4631-85bb-e0a6378f33b9 HTTP/1.1" 200 -
+172.19.0.1 - - [25/Mar/2026 13:27:04] "GET /?hideControls=true&password=76c56ce8-a7e7-4631-85bb-e0a6378f33b9 HTTP/1.1" 200 -
+172.19.0.1 - - [25/Mar/2026 13:27:05] "GET /styles.css HTTP/1.1" 200 -
+172.19.0.1 - - [25/Mar/2026 13:27:07] "GET /firebase-config.js HTTP/1.1" 200 -
+172.19.0.1 - - [25/Mar/2026 13:27:07] "GET /script.js HTTP/1.1" 200 -
